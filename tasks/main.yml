@@ -60,11 +60,21 @@
     dest: "{{ aptly_gpg_key_dir }}/gpg2_gen_key"
     mode: 0644
 
-# if this times out then try running a command such as `find / | xargs file` on the server to generate entropy
-- name: create key
-  command: gpg2 --batch --gen-key {{ aptly_gpg_key_dir }}/gpg2_gen_key
-  args:
-    creates: "{{ aptly_gpg_key_dir }}/key.sec"
+# this always times out
+#- name: create key
+#  command: gpg2 --batch --gen-key {{ aptly_gpg_key_dir }}/gpg2_gen_key
+#  args:
+#    creates: "{{ aptly_gpg_key_dir }}/key.sec"
+
+- name: "check if {{ aptly_gpg_key_dir }}/key.sec exists"
+  stat:
+    path: "{{ aptly_gpg_key_dir }}/key.sec"
+  register: aptly_gpg_key_secret_key
+
+- name: "fail if {{ aptly_gpg_key_dir }}/key.sec doesn't exist"
+  fail:
+    msg: "you need to ssh into the server and run this command: gpg2 --batch --gen-key {{ aptly_gpg_key_dir }}/gpg2_gen_key"
+  when: aptly_gpg_key_secret_key.stat.exists == False
 
 - name: stop random source
   service:
