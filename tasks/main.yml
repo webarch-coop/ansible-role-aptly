@@ -63,18 +63,8 @@
 # if this times out then try running a command such as `find / | xargs file` on the server to generate entropy
 - name: create key
   command: gpg2 --batch --gen-key {{ aptly_gpg_key_dir }}/gpg2_gen_key
-  async: 1000
-  poll: 0
   args:
     creates: "{{ aptly_gpg_key_dir }}/key.sec"
-  register: aptly_gpg_gen_key
-
-- name: Check status of gpg gen-key
-  async_status:
-    jid: "{{ aptly_gpg_gen_key.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  retries: 60
 
 - name: stop random source
   service:
