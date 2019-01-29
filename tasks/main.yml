@@ -21,11 +21,24 @@
 
 # begin key creation tasks (automatically generates and imports a DSA key-pair to get you up and running quickly)
 
+- name: Check if /dev/hwrandom exists
+  stat:
+    path: /dev/hwrandom
+  register: aptly_hwrandom
+
+- name: start rngd for entropy creation
+  become: true
+  command: rngd -b -r /dev/random
+  args:
+    creates: "{{ aptly_gpg_key_dir }}/key.sec"
+  when: aptly_hwrandom.stat.exists == False
+
 - name: start rngd for entropy creation
   become: true
   command: rngd -b -r /dev/hwrandom
   args:
     creates: "{{ aptly_gpg_key_dir }}/key.sec"
+  when: aptly_hwrandom.stat.exists == True
 
 - name: create aptly_gpg_key_dir
   file:
