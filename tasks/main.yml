@@ -28,8 +28,7 @@
 
 - name: Check if rngd is running
   shell: ps -lA | grep rngd
-  args:
-    warn: False
+  ignore_errors: true
   register: aptly_rngd
 
 - name: Kill rngd if it is running
