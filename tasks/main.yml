@@ -33,7 +33,7 @@
 
 - name: Kill rngd if it is running
   command: killall rngd
-  when: '"rndg" in aptly_rngd.stdout'
+  when: '"rndg" in aptly_rngd.stderr'
 
 - name: start rngd for entropy creation
   become: true
