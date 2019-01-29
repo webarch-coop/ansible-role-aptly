@@ -31,17 +31,9 @@
   ignore_errors: true
   register: aptly_rngd
 
-- debug:
-    msg: "ps -lA | grep rngd stderr: {{ aptly_rngd.stderr }}"
-    verbosity: 1
-
-- debug:
-    msg: "ps -lA | grep rngd stdout: {{ aptly_rngd.stdout }}"
-    verbosity: 1
-
 - name: Kill rngd if it is running
   command: killall rngd
-  when: '"rndg" in aptly_rngd.stderr'
+  when: '"rngd" in aptly_rngd.stdout'
 
 - name: start rngd for entropy creation
   become: true
