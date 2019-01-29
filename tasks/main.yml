@@ -26,6 +26,14 @@
     path: /dev/hwrandom
   register: aptly_hwrandom
 
+- name: Check if rngd is running
+  shell: ps -lA | grep rngd
+  register: aptly_rngd
+
+- name: Kill rngd if it is running
+  command: killall rngd
+  when: '"rndg" in aptly_rngd.stdout'
+
 - name: start rngd for entropy creation
   become: true
   command: rngd -b -r /dev/random
