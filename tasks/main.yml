@@ -67,11 +67,28 @@
   poll: 0
   args:
     creates: "{{ aptly_gpg_key_dir }}/key.sec"
+  register: aptly_gpg_gen_key
+
+- name: Check status of gpg gen-key
+  async_status:
+    jid: "{{ aptly_gpg_gen_key.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: 60
 
 - name: stop random source
   service:
     name: rng-tools
     state: stopped
+
+- name: Check if rngd is running
+  shell: ps -lA | grep rngd
+  ignore_errors: true
+  register: aptly_rngd
+
+- name: Kill rngd if it is running
+  command: killall rngd
+  when: '"rngd" in aptly_rngd.stdout'
 
 - name: import pub key to gnupg
   command: gpg2 --import {{ aptly_gpg_key_dir }}/key.pub
