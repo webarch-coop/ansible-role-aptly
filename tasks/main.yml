@@ -60,8 +60,11 @@
     dest: "{{ aptly_gpg_key_dir }}/gpg2_gen_key"
     mode: 0644
 
+# if this times out then try running a command such as `find / | xargs file` on the server to generate entropy
 - name: create key
   command: gpg2 --batch --gen-key {{ aptly_gpg_key_dir }}/gpg2_gen_key
+  async: 1000
+  poll: 0
   args:
     creates: "{{ aptly_gpg_key_dir }}/key.sec"
 
